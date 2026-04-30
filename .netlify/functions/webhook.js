@@ -1,16 +1,20 @@
 exports.handler = async (event) => {
   try {
-    const body = JSON.parse(event.body || "{}");
+    const params = event.queryStringParameters || {};
+    const body = event.body ? JSON.parse(event.body) : {};
+
+    const data = { ...params, ...body };
 
     const signal = {
       id: Date.now(),
       time: new Date().toISOString(),
-      action: body.action || body.signal || "",
-      symbol: body.symbol || body.ticker || "",
-      price: body.price || "",
-      sl: body.sl || "",
-      tp: body.tp || "",
-      result: "OPEN"
+      action: (data.action || data.signal || "").toUpperCase(),
+      symbol: data.symbol || data.ticker || "",
+      price: data.price || "",
+      sl: data.sl || "",
+      tp: data.tp || "",
+      result: "OPEN",
+      pattern: data.pattern || "N/A"
     };
 
     global.signals = global.signals || [];
