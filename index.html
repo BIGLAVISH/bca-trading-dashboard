@@ -5,22 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     *{box-sizing:border-box}
-    body{margin:0;background:#050505;color:#f8f3e6;font-family:Arial,Helvetica,sans-serif}
-    .app{display:flex;min-height:100vh;background:radial-gradient(circle at center,#211707 0,#050505 55%)}
-    aside{width:260px;background:#080808;border-right:1px solid #3d2a0b;padding:18px;position:fixed;height:100vh;overflow:auto}
+    body{margin:0;background:#040404;color:#fff;font-family:Arial,Helvetica,sans-serif}
+    body:before{content:"";position:fixed;inset:0;background:url("lavish-gemz.jpeg") center/cover no-repeat;opacity:.22;z-index:-2}
+    body:after{content:"";position:fixed;inset:0;background:radial-gradient(circle,#1d1406 0,#050505 65%);opacity:.88;z-index:-1}
+    .app{display:flex;min-height:100vh}
+    aside{width:260px;background:rgba(0,0,0,.88);border-right:1px solid #8b650d;padding:18px;position:fixed;height:100vh;overflow:auto}
     main{margin-left:260px;width:calc(100% - 260px);padding:24px}
-    .logo{font-size:22px;font-weight:900;color:#d8a83f;letter-spacing:2px;margin-bottom:30px}
-    .nav button,.goldBtn{width:100%;background:transparent;color:#f8e7b1;border:1px solid transparent;padding:14px;text-align:left;border-radius:8px;margin-bottom:8px;font-size:15px}
+    .logo{font-size:22px;font-weight:900;color:#d8a83f;letter-spacing:2px;margin-bottom:25px}
+    .nav button,.goldBtn{width:100%;background:transparent;color:#f8e7b1;border:1px solid transparent;padding:14px;text-align:left;border-radius:8px;margin-bottom:8px;font-size:15px;cursor:pointer}
     .nav button.active,.nav button:hover,.goldBtn{background:#8b650d;border-color:#d6a63d;color:white}
-    .user{border:1px solid #3d2a0b;border-radius:12px;padding:14px;margin-top:20px}
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
-    input,select{background:#090909;border:1px solid #6b4a13;color:#fff;padding:12px;border-radius:8px}
-    .hero{background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.7));border-radius:18px;padding:28px;border:1px solid #3d2a0b;position:relative;overflow:hidden}
-    .hero:before{content:"LAVISH GEMZ";position:absolute;font-size:140px;font-weight:900;color:rgba(214,166,61,.07);top:20%;left:10%;transform:rotate(-10deg)}
-    h1,h2,h3{margin:0 0 12px}
+    header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:25px}
+    input,select,textarea{background:#090909;border:1px solid #6b4a13;color:#fff;padding:12px;border-radius:8px}
+    .hero{border-radius:18px;padding:28px;border:1px solid #3d2a0b;background:rgba(0,0,0,.72)}
     .gold{color:#d8a83f}
     .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:22px 0}
-    .card{background:rgba(12,12,12,.92);border:1px solid #3d2a0b;border-radius:14px;padding:18px;box-shadow:0 0 20px rgba(0,0,0,.4)}
+    .card{background:rgba(10,10,10,.9);border:1px solid #3d2a0b;border-radius:14px;padding:18px;box-shadow:0 0 20px rgba(0,0,0,.5)}
     .stat{font-size:30px;font-weight:900}
     .up{color:#22c55e}.down{color:#ef4444}.pending{color:#d8a83f}
     .two{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
@@ -28,20 +27,13 @@
     th,td{padding:12px;border-bottom:1px solid #2b210d;text-align:left}
     .tag{padding:5px 9px;border-radius:6px;font-size:12px;font-weight:bold}
     .buy{background:#14532d;color:#b7ffd1}.sell{background:#7f1d1d;color:#ffd0d0}.closed{background:#143d22;color:#baffc9}
-    .chart{height:260px;border:1px solid #3d2a0b;border-radius:12px;padding:15px;background:linear-gradient(180deg,#121212,#070707)}
-    .bar{height:8px;background:#d8a83f;margin:12px 0;border-radius:20px}
     .page{display:none}.page.active{display:block}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .actions button{background:#111;border:1px solid #6b4a13;color:#f8e7b1;padding:9px 12px;border-radius:8px}
-    .actions button:hover{background:#8b650d;color:#fff}
     .circle{width:150px;height:150px;border-radius:50%;border:14px solid #d8a83f;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;margin:auto}
-    textarea{width:100%;min-height:120px;background:#080808;color:white;border:1px solid #6b4a13;border-radius:10px;padding:10px}
-    @media(max-width:900px){
-      aside{position:relative;width:100%;height:auto}
-      main{margin-left:0;width:100%}
-      .app{display:block}
-      .grid,.two{grid-template-columns:1fr}
-    }
+    .logoBox{margin-top:20px;border:1px solid #6b4a13;border-radius:14px;padding:12px;text-align:center}
+    .logoBox img{width:100%;border-radius:10px;opacity:.9}
+    @media(max-width:900px){aside{position:relative;width:100%;height:auto}main{margin-left:0;width:100%}.app{display:block}.grid,.two{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -57,67 +49,41 @@
       <button onclick="showPage('bridge',this)">🔌 MT4 / MT5 Bridge</button>
       <button onclick="showPage('wallets',this)">💼 Wallets</button>
       <button onclick="showPage('transactions',this)">💳 Transactions</button>
-      <button onclick="showPage('plans',this)">📦 Plans & Pricing</button>
-      <button onclick="showPage('support',this)">🎧 Support Tickets</button>
       <button onclick="showPage('reports',this)">📊 Reports</button>
       <button onclick="showPage('settings',this)">⚙️ Settings</button>
     </div>
-    <div class="user">
-      <b>Admin</b><br>
-      <small>admin@bca.local</small>
-      <button class="goldBtn" onclick="alert('Logged out locally')">Logout</button>
-    </div>
+    <div class="logoBox"><img src="lavish-gemz.jpeg"></div>
+    <button class="goldBtn" onclick="alert('Logged out locally')">Logout</button>
   </aside>
 
   <main>
     <header>
-      <div></div>
-      <div>
-        <input id="search" placeholder="Search anything..." onkeyup="filterTables()">
-        🔔 <span id="bellCount">0</span>
-      </div>
+      <h1 class="gold">Welcome back, Admin 👑</h1>
+      <input id="search" placeholder="Search anything..." onkeyup="render()">
     </header>
 
     <section id="dashboard" class="page active">
       <div class="hero">
-        <h1 class="gold">Welcome back, Admin 👑</h1>
-        <p>Here’s what’s happening with your trading platform today.</p>
-
+        <p>Rare opportunities. Real moves. Real wealth.</p>
         <div class="grid">
-          <div class="card"><p>Total Users</p><div class="stat" id="totalUsers">1</div><small class="up">↑ local admin</small></div>
-          <div class="card"><p>Total Balance</p><div class="stat" id="balance">$0.00</div><small class="up">tracked P/L</small></div>
-          <div class="card"><p>Total Trades</p><div class="stat" id="totalTrades">0</div><small class="up">from signals</small></div>
-          <div class="card"><p>Active Signals</p><div class="stat" id="activeSignals">0</div><small class="up">live feed</small></div>
+          <div class="card"><p>Total Users</p><div class="stat">1</div><small class="up">Admin active</small></div>
+          <div class="card"><p>Total Balance</p><div class="stat" id="balance">$0.00</div><small>tracked P/L</small></div>
+          <div class="card"><p>Total Trades</p><div class="stat" id="totalTrades">0</div><small>from signals</small></div>
+          <div class="card"><p>Active Signals</p><div class="stat" id="activeSignals">0</div><small>live feed</small></div>
         </div>
 
         <div class="two">
           <div class="card">
-            <h3>Platform Growth</h3>
-            <div class="chart" id="growthChart"></div>
-          </div>
-          <div class="card">
-            <h3>Recent Trades</h3>
-            <table>
-              <thead><tr><th>Pair</th><th>Type</th><th>Lot</th><th>Profit</th><th>Status</th></tr></thead>
-              <tbody id="recentTrades"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="two" style="margin-top:18px">
-          <div class="card">
             <h3>Signal Performance</h3>
             <div class="circle" id="winRateCircle">0%</div>
-            <p>Total Signals: <b id="totalSignals">0</b></p>
+            <p>Total: <b id="totalSignals">0</b></p>
             <p>Won: <b class="up" id="wins">0</b></p>
             <p>Lost: <b class="down" id="losses">0</b></p>
             <p>Pending: <b class="pending" id="pending">0</b></p>
           </div>
           <div class="card">
-            <h3>MT4 / MT5 Bridge Status</h3>
-            <p>MetaTrader 4: <span class="up" id="mt4Status">Connected</span></p>
-            <p>MetaTrader 5: <span class="pending">Ready</span></p>
-            <button class="goldBtn" onclick="showPage('bridge')">Go to Bridge Settings</button>
+            <h3>Recent Trades</h3>
+            <table><thead><tr><th>Pair</th><th>Type</th><th>Profit</th><th>Status</th></tr></thead><tbody id="recentTrades"></tbody></table>
           </div>
         </div>
       </div>
@@ -130,48 +96,18 @@
         <button onclick="sendTest('SELL')">Send SELL Test</button>
         <button onclick="sendTest('CLOSE')">Send CLOSE Test</button>
         <button onclick="exportCSV()">Export CSV</button>
-        <button onclick="clearSignals()">Clear Local</button>
+        <button onclick="clearSignals()">Clear</button>
       </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Time</th><th>Symbol</th><th>Action</th><th>Pattern</th><th>Price</th><th>SL</th><th>TP</th><th>Result</th><th>Update</th></tr></thead>
-          <tbody id="signalTable"></tbody>
-        </table>
-      </div>
+      <div class="card"><table><thead><tr><th>Time</th><th>Symbol</th><th>Action</th><th>Pattern</th><th>Price</th><th>Result</th><th>Update</th></tr></thead><tbody id="signalTable"></tbody></table></div>
     </section>
 
-    <section id="trades" class="page">
-      <h2 class="gold">Trades</h2>
-      <div class="card">
-        <table>
-          <thead><tr><th>Pair</th><th>Side</th><th>Entry</th><th>SL</th><th>TP</th><th>Pattern</th><th>Status</th></tr></thead>
-          <tbody id="tradeTable"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section id="bridge" class="page">
-      <h2 class="gold">MT4 / MT5 Bridge</h2>
-      <div class="card">
-        <h3>Webhook URL</h3>
-        <input style="width:100%" id="webhookUrl" readonly>
-        <button class="goldBtn" onclick="copyWebhook()">Copy Webhook URL</button>
-      </div>
-      <div class="card">
-        <h3>MT4 Signal Format</h3>
-        <textarea readonly>BUY|SL=300|TP=600|LOT=0.01
-SELL|SL=300|TP=600|LOT=0.01
-CLOSE</textarea>
-      </div>
-    </section>
-
+    <section id="trades" class="page"><h2 class="gold">Trades</h2><div class="card"><table><thead><tr><th>Pair</th><th>Side</th><th>Entry</th><th>SL</th><th>TP</th><th>Status</th></tr></thead><tbody id="tradeTable"></tbody></table></div></section>
+    <section id="bridge" class="page"><h2 class="gold">MT4 / MT5 Bridge</h2><div class="card"><input style="width:100%" id="webhookUrl" readonly><button class="goldBtn" onclick="copyWebhook()">Copy Webhook URL</button></div></section>
     <section id="copy" class="page"><h2 class="gold">Copy Trading</h2><div class="card"><button class="goldBtn" onclick="toggleCopy()">Toggle Copy Trading</button><p id="copyStatus">Copy trading: OFF</p></div></section>
-    <section id="users" class="page"><h2 class="gold">Users</h2><div class="card">Admin user active. Client login module ready for V4.</div></section>
-    <section id="wallets" class="page"><h2 class="gold">Wallets</h2><div class="card">Balance tracking: <b id="walletBalance">$0.00</b></div></section>
-    <section id="transactions" class="page"><h2 class="gold">Transactions</h2><div class="card" id="txList">No transactions yet.</div></section>
-    <section id="plans" class="page"><h2 class="gold">Plans & Pricing</h2><div class="card">Free / Pro / Elite plan controls ready.</div></section>
-    <section id="support" class="page"><h2 class="gold">Support Tickets</h2><div class="card"><input placeholder="New ticket"><button class="goldBtn">Create Ticket</button></div></section>
-    <section id="reports" class="page"><h2 class="gold">Reports</h2><div class="card"><button class="goldBtn" onclick="exportCSV()">Download Signal Report CSV</button></div></section>
+    <section id="users" class="page"><h2 class="gold">Users</h2><div class="card">Admin user active.</div></section>
+    <section id="wallets" class="page"><h2 class="gold">Wallets</h2><div class="card">Balance: <b id="walletBalance">$0.00</b></div></section>
+    <section id="transactions" class="page"><h2 class="gold">Transactions</h2><div class="card">No transactions yet.</div></section>
+    <section id="reports" class="page"><h2 class="gold">Reports</h2><div class="card"><button class="goldBtn" onclick="exportCSV()">Download CSV</button></div></section>
     <section id="settings" class="page"><h2 class="gold">Settings</h2><div class="card"><button class="goldBtn" onclick="localStorage.clear();location.reload()">Reset Dashboard</button></div></section>
   </main>
 </div>
@@ -180,102 +116,57 @@ CLOSE</textarea>
 let signals = JSON.parse(localStorage.getItem("bcaSignals") || "[]");
 let copyOn = false;
 
-function showPage(id, btn){
+function showPage(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  if(btn)btn.classList.add("active");
 }
 
-function save(){ localStorage.setItem("bcaSignals", JSON.stringify(signals)); }
+function save(){localStorage.setItem("bcaSignals",JSON.stringify(signals));}
 
 function patternDetect(s){
-  const a=(s.action||"").toUpperCase();
-  const p=(s.pattern||"").toLowerCase();
-  if(p && p !== "n/a") return s.pattern;
-  if(a==="BUY") return "Bullish Breakout / Reversal";
-  if(a==="SELL") return "Bearish Breakdown / Reversal";
-  return "Manual / Close Signal";
+  if(s.pattern && s.pattern !== "N/A") return s.pattern;
+  if((s.action||"").includes("BUY")) return "Bullish Pattern";
+  if((s.action||"").includes("SELL")) return "Bearish Pattern";
+  return "Manual Signal";
 }
 
 async function loadSignals(){
   try{
-    const res = await fetch("/.netlify/functions/latest");
-    const data = await res.json();
-    if(Array.isArray(data) && data.length){
-      data.forEach(x=>{
-        if(!signals.find(s=>s.id===x.id)){
-          x.pattern = patternDetect(x);
-          signals.unshift(x);
-        }
-      });
-      save();
-    }
+    const r=await fetch("/.netlify/functions/latest");
+    const data=await r.json();
+    if(Array.isArray(data)) data.forEach(x=>{if(!signals.find(s=>s.id===x.id)){x.pattern=patternDetect(x);signals.unshift(x);}});
+    save();
   }catch(e){}
   render();
 }
 
 function render(){
-  let wins=signals.filter(s=>s.result==="WIN").length;
-  let losses=signals.filter(s=>s.result==="LOSS").length;
-  let pending=signals.filter(s=>(s.result||"OPEN")==="OPEN").length;
-  let total=signals.length;
-  let wr=total?Math.round((wins/total)*100):0;
-  let pnl=signals.reduce((a,s)=>a+(Number(s.profit)||0),0);
+  const q=(document.getElementById("search")?.value||"").toLowerCase();
+  let list=signals.filter(s=>JSON.stringify(s).toLowerCase().includes(q));
+  let wins=list.filter(s=>s.result==="WIN").length, losses=list.filter(s=>s.result==="LOSS").length, pending=list.filter(s=>(s.result||"OPEN")==="OPEN").length;
+  let total=list.length, wr=total?Math.round((wins/total)*100):0, pnl=list.reduce((a,s)=>a+(Number(s.profit)||0),0);
 
-  totalTrades.textContent=total;
-  activeSignals.textContent=pending;
-  totalSignals.textContent=total;
-  winsEl=document.getElementById("wins"); winsEl.textContent=wins;
-  lossesEl=document.getElementById("losses"); lossesEl.textContent=losses;
-  document.getElementById("pending").textContent=pending;
-  winRateCircle.textContent=wr+"%";
-  balance.textContent="$"+pnl.toFixed(2);
-  walletBalance.textContent="$"+pnl.toFixed(2);
-  bellCount.textContent=pending;
-  navSignalCount.textContent=pending+" New";
-  webhookUrl.value=location.origin+"/.netlify/functions/webhook";
+  totalTrades.textContent=total; activeSignals.textContent=pending; totalSignals.textContent=total; wins.textContent=wins; losses.textContent=losses; document.getElementById("pending").textContent=pending;
+  winRateCircle.textContent=wr+"%"; balance.textContent="$"+pnl.toFixed(2); walletBalance.textContent="$"+pnl.toFixed(2); navSignalCount.textContent=pending+" New"; webhookUrl.value=location.origin+"/.netlify/functions/webhook";
 
-  signalTable.innerHTML=signals.map((s,i)=>`
-    <tr>
-      <td>${new Date(s.time||Date.now()).toLocaleString()}</td>
-      <td>${s.symbol||"-"}</td>
-      <td><span class="tag ${String(s.action).includes("BUY")?"buy":"sell"}">${s.action||"-"}</span></td>
-      <td>${patternDetect(s)}</td>
-      <td>${s.price||"-"}</td>
-      <td>${s.sl||"-"}</td>
-      <td>${s.tp||"-"}</td>
-      <td class="${s.result==="WIN"?"up":s.result==="LOSS"?"down":"pending"}">${s.result||"OPEN"}</td>
-      <td><button onclick="mark(${i},'WIN')">WIN</button><button onclick="mark(${i},'LOSS')">LOSS</button></td>
-    </tr>`).join("");
+  signalTable.innerHTML=list.map((s,i)=>`<tr><td>${new Date(s.time||Date.now()).toLocaleString()}</td><td>${s.symbol||"-"}</td><td><span class="tag ${String(s.action).includes("BUY")?"buy":"sell"}">${s.action||"-"}</span></td><td>${patternDetect(s)}</td><td>${s.price||"-"}</td><td class="${s.result==="WIN"?"up":s.result==="LOSS"?"down":"pending"}">${s.result||"OPEN"}</td><td><button onclick="mark(${i},'WIN')">WIN</button><button onclick="mark(${i},'LOSS')">LOSS</button></td></tr>`).join("");
 
-  tradeTable.innerHTML=signals.map(s=>`
-    <tr><td>${s.symbol||"-"}</td><td>${s.action||"-"}</td><td>${s.price||"-"}</td><td>${s.sl||"-"}</td><td>${s.tp||"-"}</td><td>${patternDetect(s)}</td><td>${s.result||"OPEN"}</td></tr>
-  `).join("");
-
-  recentTrades.innerHTML=signals.slice(0,5).map(s=>`
-    <tr><td>${s.symbol||"XAUUSD"}</td><td><span class="tag ${String(s.action).includes("BUY")?"buy":"sell"}">${s.action||"BUY"}</span></td><td>${s.lot||"0.01"}</td><td class="${s.result==="LOSS"?"down":"up"}">${s.profit?"$"+s.profit:"-"}</td><td><span class="tag closed">${s.result||"OPEN"}</span></td></tr>
-  `).join("");
-
-  growthChart.innerHTML = signals.slice(0,12).reverse().map((s,i)=>`<div class="bar" style="width:${20+i*6}%"></div>`).join("");
+  tradeTable.innerHTML=list.map(s=>`<tr><td>${s.symbol||"-"}</td><td>${s.action||"-"}</td><td>${s.price||"-"}</td><td>${s.sl||"-"}</td><td>${s.tp||"-"}</td><td>${s.result||"OPEN"}</td></tr>`).join("");
+  recentTrades.innerHTML=list.slice(0,5).map(s=>`<tr><td>${s.symbol||"EURUSD"}</td><td><span class="tag ${String(s.action).includes("BUY")?"buy":"sell"}">${s.action||"BUY"}</span></td><td class="${s.result==="LOSS"?"down":"up"}">${s.profit?"$"+s.profit:"-"}</td><td><span class="tag closed">${s.result||"OPEN"}</span></td></tr>`).join("");
 }
 
 function mark(i,result){signals[i].result=result;signals[i].profit=result==="WIN"?100:-50;save();render();}
 async function sendTest(action){
   const sig={id:Date.now(),time:new Date().toISOString(),action,symbol:"EURUSD",price:"1.0850",sl:"1.0800",tp:"1.0950",result:"OPEN",pattern:action==="BUY"?"Bullish Flag":"Bearish Flag"};
   signals.unshift(sig);save();render();
-  try{await fetch("/.netlify/functions/webhook?action="+action+"&symbol=EURUSD&price=1.0850&pattern="+encodeURIComponent(sig.pattern));}catch(e){}
 }
 function clearSignals(){signals=[];save();render();}
 function copyWebhook(){navigator.clipboard.writeText(webhookUrl.value);alert("Webhook copied");}
 function toggleCopy(){copyOn=!copyOn;copyStatus.textContent="Copy trading: "+(copyOn?"ON":"OFF");}
-function exportCSV(){
-  let csv="time,symbol,action,pattern,price,sl,tp,result,profit\n"+signals.map(s=>`${s.time},${s.symbol},${s.action},${patternDetect(s)},${s.price},${s.sl},${s.tp},${s.result},${s.profit||0}`).join("\n");
-  let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="bca_signals.csv";a.click();
-}
-function filterTables(){render();}
-setInterval(loadSignals,3000);
-loadSignals();
+function exportCSV(){let csv="time,symbol,action,pattern,price,sl,tp,result,profit\n"+signals.map(s=>`${s.time},${s.symbol},${s.action},${patternDetect(s)},${s.price},${s.sl},${s.tp},${s.result},${s.profit||0}`).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="lavish_gemz_signals.csv";a.click();}
+setInterval(loadSignals,3000);loadSignals();
 </script>
 </body>
 </html>
