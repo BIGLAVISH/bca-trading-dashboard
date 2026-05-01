@@ -1,18 +1,26 @@
-import { getStore } from "@netlify/blobs";
+const { getStore } = require("@netlify/blobs");
 
-export default async () => {
+exports.handler = async () => {
   try {
-    const store = getStore("signals");
-
-    const data = await store.get("data", { type: "json" }) || [];
-
-    return new Response(JSON.stringify(data), {
-      headers: { "Content-Type": "application/json" }
+    const store = getStore({
+      name: "signals",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_AUTH_TOKEN
     });
 
+    let data = await store.get("data", { type: "json" });
+    if (!Array.isArray(data)) data = [];
+
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify(data)
+    };
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500
-    });
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: false, error: err.message })
+    };
   }
 };
