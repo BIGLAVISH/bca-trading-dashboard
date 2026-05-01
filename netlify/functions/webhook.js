@@ -1,41 +1,40 @@
-let latestSignal = null;
+import { getStore } from "@netlify/blobs";
 
-exports.handler = async (event) => {
+export default async (req) => {
   try {
-    if (event.httpMethod === "GET") {
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify(latestSignal ? [latestSignal] : [])
-      };
-    }
+    const store = getStore("signals");
 
-    const data = JSON.parse(event.body || "{}");
+    const body = await req.json();
 
-    latestSignal = {
-      id: Date.now().toString(),
-      time: new Date().toISOString(),
-      action: data.action || "BUY",
-      symbol: data.symbol || data.ticker || "XRPUSD",
-      price: data.price || data.close || "",
-      sl: data.sl || "10",
-      tp: data.tp || "20",
-      lot: data.lot || "0.01",
-      pattern: data.pattern || "TradingView",
-      result: "OPEN",
-      profit: 0
+    const signal = {
+      id: Date.now(),
+      action: body.action || "BUY",
+      symbol: body.symbol || "EURUSD",
+      lot: body.lot || "0.01",
+      sl: body.sl || "",
+      tp: body.tp || "",
+      time: new Date().toISOString()
     };
 
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ ok: true, signal: latestSignal })
-    };
-  } catch (e) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, error: e.message })
-    };
+    // Get existing signals
+    let existing = await store.get("data", { type: "json" }) || [];
+
+    // Add new signal
+    existing.unshift(signal);
+
+    // Keep only last 100
+    existing = existing.slice(0, 100);
+
+    // Save
+    await store.set("data", existing);
+
+    return new Response(JSON.stringify({ success: true, signal }), {
+      headers: { "Content-Type": "application/json" }
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500
+    });
   }
 };
