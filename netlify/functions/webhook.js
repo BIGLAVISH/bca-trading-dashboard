@@ -1,35 +1,53 @@
-import { getStore } from "@netlify/blobs";
+const { getStore } = require("@netlify/blobs");
 
-export default async (req) => {
+exports.handler = async (event) => {
   try {
-    const store = getStore("signals");
+    const store = getStore({
+      name: "signals",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_AUTH_TOKEN
+    });
 
-    const body = await req.json();
+    let data = {};
+
+    if (event.httpMethod === "POST" && event.body) {
+      data = JSON.parse(event.body);
+    } else {
+      data = event.queryStringParameters || {};
+    }
 
     const signal = {
-      id: Date.now(),
-      action: body.action || "BUY",
-      symbol: body.symbol || "EURUSD",
-      lot: body.lot || "0.01",
-      sl: body.sl || "",
-      tp: body.tp || "",
-      time: new Date().toISOString()
+      id: Date.now().toString(),
+      time: new Date().toISOString(),
+      action: data.action || "BUY",
+      symbol: data.symbol || "EURUSD",
+      price: data.price || "",
+      lot: data.lot || "0.01",
+      sl: data.sl || "",
+      tp: data.tp || "",
+      pattern: data.pattern || "TradingView",
+      result: "OPEN",
+      profit: 0
     };
 
-    let existing = await store.get("data", { type: "json" }) || [];
+    let existing = await store.get("data", { type: "json" });
+    if (!Array.isArray(existing)) existing = [];
 
     existing.unshift(signal);
     existing = existing.slice(0, 100);
 
-    await store.set("data", existing);
+    await store.setJSON("data", existing);
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { "Content-Type": "application/json" }
-    });
-
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: true, signal })
+    };
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500
-    });
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: false, error: err.message })
+    };
   }
 };
