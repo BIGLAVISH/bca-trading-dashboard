@@ -1,26 +1,52 @@
-param(
-  [Parameter(Mandatory=$true)][string]$NetlifyUrl,
-  [string]$SignalFile = "$env:APPDATA\MetaQuotes\Terminal\Common\Files\bca_signal.txt",
-  [int]$PollSeconds = 2
-)
-Write-Host "BCA MT4 Relay running..." -ForegroundColor Green
-Write-Host "Polling: $NetlifyUrl/.netlify/functions/latest"
-Write-Host "Writing: $SignalFile"
-New-Item -ItemType Directory -Force -Path (Split-Path $SignalFile) | Out-Null
+$DashboardLatestUrl = "https://bca-trading-dashboard.netlify.app/.netlify/functions/latest"
+$SignalFileName = "bca_signal.txt"
+
+$common = Join-Path $env:APPDATA "MetaQuotes\Terminal\Common\Files"
+
+if (!(Test-Path $common)) {
+  New-Item -ItemType Directory -Force -Path $common | Out-Null
+}
+
+$outFile = Join-Path $common $SignalFileName
 $lastId = ""
-while($true){
-  try{
-    $s = Invoke-RestMethod -Uri ($NetlifyUrl.TrimEnd('/') + '/.netlify/functions/latest') -UseBasicParsing
-    if($s.id -and $s.id -ne $lastId){
-      $cmd = $s.action
-      if($s.sl){$cmd += "|SL=$($s.sl)"}
-      if($s.tp){$cmd += "|TP=$($s.tp)"}
-      if($s.lot){$cmd += "|LOT=$($s.lot)"}
-      Set-Content -Path $SignalFile -Value $cmd -Encoding ASCII
-      Add-Content -Path (Join-Path (Split-Path $SignalFile) 'bca_relay_log.csv') -Value ('"{0}","{1}","{2}","{3}"' -f (Get-Date).ToString('s'),$s.action,$s.symbol,$cmd)
-      Write-Host "Wrote signal: $cmd" -ForegroundColor Cyan
-      $lastId = $s.id
+
+Write-Host "BCA MT4 Relay Running..."
+Write-Host "Reading: $DashboardLatestUrl"
+Write-Host "Writing: $outFile"
+
+while ($true) {
+  try {
+    $data = Invoke-RestMethod -Uri $DashboardLatestUrl -Method GET -TimeoutSec 10
+
+    if ($data -and $data.Count -gt 0) {
+      $s = $data[0]
+
+      if ($s.id -ne $lastId) {
+
+        $action = "$($s.action)".ToUpper()
+        $lot = if ($s.lot) { $s.lot } else { "0.01" }
+        $sl = if ($s.sl) { $s.sl } else { "" }
+        $tp = if ($s.tp) { $s.tp } else { "" }
+
+        if ($action -eq "BUY" -or $action -eq "SELL" -or $action -eq "CLOSE" -or $action -eq "CLOSEBUY" -or $action -eq "CLOSESELL") {
+
+          $line = "$action|LOT=$lot"
+
+          if ($sl -ne "") { $line += "|SL=$sl" }
+          if ($tp -ne "") { $line += "|TP=$tp" }
+
+          Set-Content -Path $outFile -Value $line -Encoding ASCII
+
+          Write-Host "$(Get-Date) -> $line"
+
+          $lastId = $s.id
+        }
+      }
     }
-  } catch { Write-Host "Relay error: $($_.Exception.Message)" -ForegroundColor Yellow }
-  Start-Sleep -Seconds $PollSeconds
+
+  } catch {
+    Write-Host "Waiting for dashboard signal..."
+  }
+
+  Start-Sleep -Seconds 2
 }
