@@ -1,33 +1,42 @@
+let signals = global.signals || [];
+
 exports.handler = async (event) => {
   try {
     const params = event.queryStringParameters || {};
-    const body = event.body ? JSON.parse(event.body) : {};
+    let body = {};
+
+    if (event.body) {
+      try { body = JSON.parse(event.body); } catch { body = {}; }
+    }
 
     const data = { ...params, ...body };
 
     const signal = {
       id: Date.now(),
       time: new Date().toISOString(),
-      action: (data.action || data.signal || "").toUpperCase(),
-      symbol: data.symbol || data.ticker || "",
-      price: data.price || "",
+      action: String(data.action || data.signal || "TEST").toUpperCase(),
+      symbol: data.symbol || data.ticker || "UNKNOWN",
+      price: data.price || data.close || "",
       sl: data.sl || "",
       tp: data.tp || "",
+      lot: data.lot || "0.01",
+      pattern: data.pattern || "TradingView Signal",
       result: "OPEN",
-      pattern: data.pattern || "N/A"
+      profit: Number(data.profit || 0)
     };
 
-    global.signals = global.signals || [];
-    global.signals.unshift(signal);
+    signals.unshift(signal);
+    global.signals = signals;
 
     return {
       statusCode: 200,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ success: true, signal })
     };
-  } catch (e) {
+  } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: e.message })
+      body: JSON.stringify({ success: false, error: err.message })
     };
   }
 };
