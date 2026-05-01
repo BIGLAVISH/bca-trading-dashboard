@@ -2,153 +2,565 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lavish Gemz</title>
+<title>Lavish Gemz Control Center</title>
 
 <style>
-body{margin:0;background:#000;color:#fff;font-family:Arial}
-.menu{position:fixed;top:20px;left:20px;background:#987114;color:#fff;border:none;padding:15px;font-size:20px;border-radius:10px}
-.sidebar{position:fixed;width:260px;height:100%;background:#000;padding:80px 15px;transition:.3s;overflow:auto}
-.sidebar button{display:block;width:100%;margin:8px 0;padding:12px;background:none;border:1px solid #444;color:#fff;border-radius:8px}
-.main{margin-left:260px;padding:20px}
-.collapsed .sidebar{transform:translateX(-100%)}
-.collapsed .main{margin-left:0}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;overflow-x:hidden;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
 
-.card{border:1px solid #555;padding:15px;margin:10px 0;border-radius:10px}
-.gold{color:#d6a63d}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("lavish-gemz.jpg") center/cover no-repeat;
+  opacity:.45;
+  filter:contrast(1.15) brightness(.95);
+  z-index:-2;
+}
+
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  z-index:-1;
+}
+
+.menuBtn{
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:9999;
+  width:64px;
+  height:64px;
+  border-radius:14px;
+  border:2px solid #d6a63d;
+  background:#987114;
+  color:#fff;
+  font-size:30px;
+}
+
+.app{width:100%;min-height:100vh}
+
+.sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:290px;
+  height:100vh;
+  background:rgba(0,0,0,.92);
+  border-right:1px solid #8b650d;
+  padding:100px 18px 24px;
+  z-index:999;
+  overflow:auto;
+  transition:.25s ease;
+}
+
+.app.closed .sidebar{transform:translateX(-100%)}
+
+.main{
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  padding:105px 18px 40px;
+}
+
+.logo{
+  color:#d8a83f;
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:3px;
+  margin-bottom:28px;
+}
+
+.nav button,.goldBtn{
+  width:100%;
+  margin-bottom:10px;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #6b4a13;
+  background:rgba(0,0,0,.65);
+  color:#f8e7b1;
+  font-size:16px;
+  text-align:left;
+}
+
+.nav button.active,.nav button:hover,.goldBtn{
+  background:#8b650d;
+  border-color:#d6a63d;
+  color:#fff;
+}
+
+.logoBox{
+  margin-top:24px;
+  border:1px solid #6b4a13;
+  border-radius:14px;
+  padding:10px;
+  background:#000;
+}
+
+.logoBox img{width:100%;border-radius:10px}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:center;
+  margin-bottom:22px;
+}
+
+h1{margin:0;color:#d8a83f;font-size:34px}
+h2{margin-top:0}
+.gold{color:#d8a83f}
+
+input{
+  width:100%;
+  max-width:360px;
+  background:#070707;
+  border:1px solid #8b650d;
+  color:#fff;
+  padding:13px;
+  border-radius:10px;
+}
+
+.card{
+  background:rgba(0,0,0,.78);
+  border:1px solid #6b4a13;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:18px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.stat{
+  font-size:32px;
+  font-weight:900;
+}
+
 .up{color:#22c55e}
 .down{color:#ef4444}
-.pending{color:#d6a63d}
+.pending{color:#d8a83f}
+
+.circle{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  border:14px solid #d8a83f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:20px auto;
+  font-size:30px;
+  font-weight:900;
+}
+
+.tableWrap{overflow-x:auto}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td{
+  padding:12px;
+  border-bottom:1px solid #31230b;
+  text-align:left;
+}
+
+.tag{
+  padding:6px 10px;
+  border-radius:7px;
+  font-weight:bold;
+  font-size:12px;
+}
+
+.buy{background:#14532d;color:#b7ffd1}
+.sell,.close{background:#7f1d1d;color:#ffd0d0}
+.open{background:#14532d;color:#b7ffd1}
+
+button{
+  cursor:pointer;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.actions button,td button{
+  background:#111;
+  color:#f8e7b1;
+  border:1px solid #8b650d;
+  border-radius:8px;
+  padding:9px 12px;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+@media(max-width:900px){
+  .main{padding:105px 18px 40px}
+  .grid,.two{grid-template-columns:1fr}
+  .header{display:block}
+  .header input{margin-top:16px;max-width:none}
+  .sidebar{width:82%;max-width:340px}
+}
 </style>
 </head>
 
 <body>
 
-<button class="menu" onclick="toggle()">☰</button>
+<button class="menuBtn" onclick="toggleSidebar()">☰</button>
 
-<div id="app">
+<div class="app closed" id="app">
+
 <div class="sidebar">
-  <button onclick="show('dashboard')">Dashboard</button>
-  <button onclick="show('signals')">Signals</button>
-  <button onclick="show('trades')">Trades</button>
+  <div class="logo">LAVISH GEMZ<br><small>CONTROL CENTER</small></div>
+
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+    <button onclick="showPage('users',this)">👥 Users</button>
+    <button onclick="showPage('signals',this)">🎯 Signals <span id="navSignalCount">0 New</span></button>
+    <button onclick="showPage('trades',this)">📈 Trades</button>
+    <button onclick="showPage('copy',this)">🔁 Copy Trading</button>
+    <button onclick="showPage('bridge',this)">🔌 MT4 / MT5 Bridge</button>
+    <button onclick="showPage('wallets',this)">💼 Wallets</button>
+    <button onclick="showPage('transactions',this)">💳 Transactions</button>
+    <button onclick="showPage('reports',this)">📊 Reports</button>
+    <button onclick="showPage('settings',this)">⚙️ Settings</button>
+  </div>
+
+  <div class="logoBox"><img src="lavish-gemz.jpg"></div>
+  <button class="goldBtn" onclick="alert('Logged out locally')">Logout</button>
 </div>
 
 <div class="main">
 
-<div id="dashboard">
-<h2 class="gold">Dashboard</h2>
+  <div class="header">
+    <h1>Welcome back,<br>Admin 👑</h1>
+    <input id="search" placeholder="Search anything..." onkeyup="render()">
+  </div>
 
-<div class="card">Win %: <span id="win">0%</span></div>
-<div class="card">Total P/L: <span id="pl">$0</span></div>
-<div class="card">Lot Size: <span id="lot">0</span></div>
+  <section id="dashboard" class="page active">
+    <div class="card">
+      <p>Rare opportunities. Real moves. Real wealth.</p>
 
-</div>
+      <div class="grid">
+        <div class="card"><p>Total Trades</p><div class="stat" id="totalTrades">0</div><small>from signals</small></div>
+        <div class="card"><p>Win %</p><div class="stat" id="winPercent">0%</div><small>closed trades</small></div>
+        <div class="card"><p>Total P/L</p><div class="stat" id="totalPL">$0.00</div><small>net profit/loss</small></div>
+        <div class="card"><p>Total Lots</p><div class="stat" id="totalLots">0.00</div><small>lot size total</small></div>
+      </div>
 
-<div id="signals" style="display:none">
-<h2 class="gold">Signals</h2>
+      <div class="two">
+        <div class="card">
+          <h2>Signal Performance</h2>
+          <div class="circle" id="winRateCircle">0%</div>
+          <p>Total: <b id="totalSignals">0</b></p>
+          <p>Won: <b class="up" id="wins">0</b></p>
+          <p>Lost: <b class="down" id="losses">0</b></p>
+          <p>Pending: <b class="pending" id="pending">0</b></p>
+          <p>Amount Won: <b class="up" id="amountWon">$0.00</b></p>
+          <p>Amount Lost: <b class="down" id="amountLost">$0.00</b></p>
+        </div>
 
-<button onclick="test('BUY')">BUY</button>
-<button onclick="test('SELL')">SELL</button>
+        <div class="card">
+          <h2>Recent Trades</h2>
+          <div class="tableWrap">
+            <table>
+              <thead><tr><th>Pair</th><th>Type</th><th>Lot</th><th>P/L</th><th>Status</th></tr></thead>
+              <tbody id="recentTrades"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<table width="100%" id="table"></table>
-</div>
+  <section id="signals" class="page">
+    <h2 class="gold">Signals</h2>
 
-<div id="trades" style="display:none">
-<h2 class="gold">Trades</h2>
-<div id="tradesList"></div>
-</div>
+    <div class="card actions">
+      <button onclick="sendTest('BUY')">Send BUY Test</button>
+      <button onclick="sendTest('SELL')">Send SELL Test</button>
+      <button onclick="sendTest('CLOSE')">Send CLOSE Test</button>
+      <button onclick="exportCSV()">Export CSV</button>
+      <button onclick="clearSignals()">Clear</button>
+    </div>
+
+    <div class="card tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th><th>Symbol</th><th>Action</th><th>Pattern</th><th>Lot</th><th>Price</th><th>SL</th><th>TP</th><th>P/L</th><th>Result</th><th>Update</th>
+          </tr>
+        </thead>
+        <tbody id="signalTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="trades" class="page">
+    <h2 class="gold">Trades</h2>
+    <div class="card tableWrap">
+      <table>
+        <thead><tr><th>Pair</th><th>Side</th><th>Lot</th><th>Entry</th><th>SL</th><th>TP</th><th>P/L</th><th>Status</th></tr></thead>
+        <tbody id="tradeTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="bridge" class="page">
+    <h2 class="gold">MT4 / MT5 Bridge</h2>
+    <div class="card">
+      <p>Webhook URL</p>
+      <input id="webhookUrl" readonly>
+      <button class="goldBtn" onclick="copyWebhook()">Copy Webhook URL</button>
+    </div>
+  </section>
+
+  <section id="copy" class="page"><h2 class="gold">Copy Trading</h2><div class="card"><button class="goldBtn" onclick="toggleCopy()">Toggle Copy Trading</button><p id="copyStatus">Copy trading: OFF</p></div></section>
+  <section id="users" class="page"><h2 class="gold">Users</h2><div class="card">Admin active. Client login next.</div></section>
+  <section id="wallets" class="page"><h2 class="gold">Wallets</h2><div class="card">Balance: <b id="walletBalance">$0.00</b></div></section>
+  <section id="transactions" class="page"><h2 class="gold">Transactions</h2><div class="card">No transactions yet.</div></section>
+  <section id="reports" class="page"><h2 class="gold">Reports</h2><div class="card"><button class="goldBtn" onclick="exportCSV()">Download CSV</button></div></section>
+  <section id="settings" class="page"><h2 class="gold">Settings</h2><div class="card"><button class="goldBtn" onclick="localStorage.clear();location.reload()">Reset Dashboard</button></div></section>
 
 </div>
 </div>
 
 <script>
-let signals = JSON.parse(localStorage.getItem("signals")||"[]");
+let signals = JSON.parse(localStorage.getItem("bcaSignals") || "[]");
+let copyOn = false;
 
-function toggle(){
-  document.getElementById("app").classList.toggle("collapsed");
+function safeNum(v){
+  let n = Number(v);
+  return isNaN(n) ? 0 : n;
 }
 
-function show(p){
-  document.getElementById("dashboard").style.display="none";
-  document.getElementById("signals").style.display="none";
-  document.getElementById("trades").style.display="none";
-  document.getElementById(p).style.display="block";
+function money(n){
+  return "$" + safeNum(n).toFixed(2);
+}
+
+function getLot(s){
+  return safeNum(s.lot || s.lots || 0.01);
+}
+
+function getPL(s){
+  return safeNum(s.profit || s.pnl || 0);
+}
+
+function toggleSidebar(){
+  document.getElementById("app").classList.toggle("closed");
+}
+
+function showPage(id,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+
+  if(window.innerWidth < 900){
+    document.getElementById("app").classList.add("closed");
+  }
 }
 
 function save(){
-  localStorage.setItem("signals",JSON.stringify(signals));
+  localStorage.setItem("bcaSignals",JSON.stringify(signals));
 }
 
-function test(type){
-  signals.unshift({
-    symbol:"EURUSD",
-    action:type,
-    lot:0.01,
-    profit:0,
-    result:"OPEN"
-  });
-  save();
+function patternDetect(s){
+  if(s.pattern && s.pattern !== "N/A") return s.pattern;
+  if(String(s.action).includes("BUY")) return "Bullish Pattern";
+  if(String(s.action).includes("SELL")) return "Bearish Pattern";
+  return "Manual Signal";
+}
+
+async function loadSignals(){
+  try{
+    const r = await fetch("/.netlify/functions/latest");
+    const data = await r.json();
+
+    if(Array.isArray(data)){
+      data.forEach(x=>{
+        if(!signals.find(s=>s.id===x.id)){
+          x.lot = x.lot || "0.01";
+          x.profit = safeNum(x.profit);
+          x.result = x.result || "OPEN";
+          x.pattern = patternDetect(x);
+          signals.unshift(x);
+        }
+      });
+      save();
+    }
+  }catch(e){}
   render();
 }
 
-function win(i){
-  signals[i].result="WIN";
-  signals[i].profit=100;
-  save(); render();
-}
-
-function loss(i){
-  signals[i].result="LOSS";
-  signals[i].profit=-50;
-  save(); render();
-}
-
-function editPL(i){
-  let v=prompt("Profit/Loss:",signals[i].profit);
-  if(v!==null){signals[i].profit=Number(v);save();render();}
-}
-
-function editLot(i){
-  let v=prompt("Lot:",signals[i].lot);
-  if(v!==null){signals[i].lot=Number(v);save();render();}
-}
-
 function render(){
-  let t=document.getElementById("table");
-  let trades=document.getElementById("tradesList");
+  const q = (document.getElementById("search")?.value || "").toLowerCase();
+  const list = signals.filter(s=>JSON.stringify(s).toLowerCase().includes(q));
 
-  let wins=signals.filter(s=>s.result=="WIN").length;
-  let losses=signals.filter(s=>s.result=="LOSS").length;
-  let closed=wins+losses;
+  const wins = list.filter(s=>s.result==="WIN").length;
+  const losses = list.filter(s=>s.result==="LOSS").length;
+  const pending = list.filter(s=>(s.result||"OPEN")==="OPEN").length;
+  const closed = wins + losses;
+  const total = list.length;
 
-  let pl=signals.reduce((a,s)=>a+s.profit,0);
-  let lot=signals.reduce((a,s)=>a+s.lot,0);
+  const winRate = closed ? Math.round((wins / closed) * 100) : 0;
+  const amountWon = list.filter(s=>s.result==="WIN").reduce((a,s)=>a+Math.abs(getPL(s)),0);
+  const amountLost = list.filter(s=>s.result==="LOSS").reduce((a,s)=>a+Math.abs(getPL(s)),0);
+  const netPL = amountWon - amountLost;
+  const totalLots = list.reduce((a,s)=>a+getLot(s),0);
 
-  document.getElementById("win").innerText=closed?Math.round(wins/closed*100)+"%":"0%";
-  document.getElementById("pl").innerText="$"+pl;
-  document.getElementById("lot").innerText=lot.toFixed(2);
+  document.getElementById("totalTrades").textContent = total;
+  document.getElementById("winPercent").textContent = winRate + "%";
+  document.getElementById("totalPL").textContent = money(netPL);
+  document.getElementById("totalLots").textContent = totalLots.toFixed(2);
+  document.getElementById("totalSignals").textContent = total;
+  document.getElementById("wins").textContent = wins;
+  document.getElementById("losses").textContent = losses;
+  document.getElementById("pending").textContent = pending;
+  document.getElementById("amountWon").textContent = money(amountWon);
+  document.getElementById("amountLost").textContent = money(amountLost);
+  document.getElementById("winRateCircle").textContent = winRate + "%";
+  document.getElementById("navSignalCount").textContent = pending + " New";
+  document.getElementById("walletBalance").textContent = money(netPL);
+  document.getElementById("webhookUrl").value = location.origin + "/.netlify/functions/webhook";
 
-  t.innerHTML=signals.map((s,i)=>`
+  document.getElementById("signalTable").innerHTML = list.map((s,i)=>`
     <tr>
-      <td>${s.symbol}</td>
-      <td>${s.action}</td>
-      <td>${s.lot}</td>
-      <td class="${s.profit>=0?'up':'down'}">$${s.profit}</td>
-      <td>${s.result}</td>
+      <td>${new Date(s.time || Date.now()).toLocaleString()}</td>
+      <td>${s.symbol || "-"}</td>
+      <td><span class="tag ${String(s.action).includes("BUY") ? "buy" : String(s.action).includes("SELL") ? "sell" : "close"}">${s.action || "-"}</span></td>
+      <td>${patternDetect(s)}</td>
+      <td>${getLot(s).toFixed(2)}</td>
+      <td>${s.price || "-"}</td>
+      <td>${s.sl || "-"}</td>
+      <td>${s.tp || "-"}</td>
+      <td class="${getPL(s)>=0 ? "up" : "down"}">${money(getPL(s))}</td>
+      <td class="${s.result==="WIN" ? "up" : s.result==="LOSS" ? "down" : "pending"}">${s.result || "OPEN"}</td>
       <td>
-        <button onclick="win(${i})">WIN</button>
-        <button onclick="loss(${i})">LOSS</button>
-        <button onclick="editPL(${i})">P/L</button>
+        <button onclick="mark(${i},'WIN')">WIN</button>
+        <button onclick="mark(${i},'LOSS')">LOSS</button>
+        <button onclick="editProfit(${i})">P/L</button>
         <button onclick="editLot(${i})">LOT</button>
       </td>
     </tr>
   `).join("");
 
-  trades.innerHTML = signals.map(s=>`
-    <div class="card">${s.symbol} | ${s.action} | ${s.lot} | $${s.profit}</div>
+  document.getElementById("tradeTable").innerHTML = list.map(s=>`
+    <tr>
+      <td>${s.symbol || "-"}</td>
+      <td>${s.action || "-"}</td>
+      <td>${getLot(s).toFixed(2)}</td>
+      <td>${s.price || "-"}</td>
+      <td>${s.sl || "-"}</td>
+      <td>${s.tp || "-"}</td>
+      <td class="${getPL(s)>=0 ? "up" : "down"}">${money(getPL(s))}</td>
+      <td>${s.result || "OPEN"}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("recentTrades").innerHTML = list.slice(0,5).map(s=>`
+    <tr>
+      <td>${s.symbol || "EURUSD"}</td>
+      <td><span class="tag ${String(s.action).includes("BUY") ? "buy" : String(s.action).includes("SELL") ? "sell" : "close"}">${s.action || "-"}</span></td>
+      <td>${getLot(s).toFixed(2)}</td>
+      <td class="${getPL(s)>=0 ? "up" : "down"}">${getPL(s)===0 ? "-" : money(getPL(s))}</td>
+      <td><span class="tag open">${s.result || "OPEN"}</span></td>
+    </tr>
   `).join("");
 }
 
-render();
+function mark(i,result){
+  signals[i].result = result;
+  if(getPL(signals[i]) === 0){
+    signals[i].profit = result === "WIN" ? 100 : -50;
+  }else{
+    signals[i].profit = result === "WIN" ? Math.abs(getPL(signals[i])) : -Math.abs(getPL(signals[i]));
+  }
+  save();
+  render();
+}
+
+function editProfit(i){
+  let val = prompt("Enter profit/loss amount:", getPL(signals[i]));
+  if(val !== null){
+    signals[i].profit = safeNum(val);
+    save();
+    render();
+  }
+}
+
+function editLot(i){
+  let val = prompt("Enter lot size:", getLot(signals[i]));
+  if(val !== null){
+    signals[i].lot = safeNum(val) || 0.01;
+    save();
+    render();
+  }
+}
+
+function sendTest(action){
+  signals.unshift({
+    id: Date.now(),
+    time: new Date().toISOString(),
+    symbol: "EURUSD",
+    action: action,
+    lot: 0.01,
+    price: "1.0850",
+    sl: "1.0800",
+    tp: "1.0950",
+    result: "OPEN",
+    profit: 0,
+    pattern: action==="BUY" ? "Bullish Flag" : action==="SELL" ? "Bearish Flag" : "Manual Close"
+  });
+  save();
+  render();
+}
+
+function clearSignals(){
+  signals=[];
+  save();
+  render();
+}
+
+function copyWebhook(){
+  navigator.clipboard.writeText(document.getElementById("webhookUrl").value);
+  alert("Webhook copied");
+}
+
+function toggleCopy(){
+  copyOn = !copyOn;
+  document.getElementById("copyStatus").textContent = "Copy trading: " + (copyOn ? "ON" : "OFF");
+}
+
+function exportCSV(){
+  let csv = "time,symbol,action,pattern,lot,price,sl,tp,result,profit\n";
+  csv += signals.map(s=>`${s.time},${s.symbol},${s.action},${patternDetect(s)},${getLot(s)},${s.price},${s.sl},${s.tp},${s.result},${getPL(s)}`).join("\n");
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="lavish_gemz_signals.csv";
+  a.click();
+}
+
+setInterval(loadSignals,3000);
+loadSignals();
 </script>
 
 </body>
