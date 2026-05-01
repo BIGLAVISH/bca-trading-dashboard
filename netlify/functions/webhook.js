@@ -16,19 +16,14 @@ export default async (req) => {
       time: new Date().toISOString()
     };
 
-    // Get existing signals
     let existing = await store.get("data", { type: "json" }) || [];
 
-    // Add new signal
     existing.unshift(signal);
-
-    // Keep only last 100
     existing = existing.slice(0, 100);
 
-    // Save
     await store.set("data", existing);
 
-    return new Response(JSON.stringify({ success: true, signal }), {
+    return new Response(JSON.stringify({ success: true }), {
       headers: { "Content-Type": "application/json" }
     });
 
