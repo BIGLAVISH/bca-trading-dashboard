@@ -1,4 +1,4 @@
-$DashboardLatestUrl = "https://bca-trading-dashboard.netlify.app/.netlify/functions/latest"
+$DashboardLatestUrl = "https://bca-trading-dashboard.netlify.app/.netlify/functions/webhook"
 $SignalFileName = "bca_signal.txt"
 
 $common = Join-Path $env:APPDATA "MetaQuotes\Terminal\Common\Files"
