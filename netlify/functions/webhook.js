@@ -1,6 +1,6 @@
-const { getStore } = require("@netlify/blobs");
+import { getStore } from "@netlify/blobs";
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const store = getStore({
       name: "signals",
