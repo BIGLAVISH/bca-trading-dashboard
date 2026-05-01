@@ -1,4 +1,7 @@
 {
   "name": "bca-trading-dashboard",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "dependencies": {
+    "@netlify/blobs": "^9.1.2"
+  }
 }
