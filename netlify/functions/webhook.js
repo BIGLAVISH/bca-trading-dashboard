@@ -1,42 +1,41 @@
-let signals = global.signals || [];
+let latestSignal = null;
 
 exports.handler = async (event) => {
   try {
-    const params = event.queryStringParameters || {};
-    let body = {};
-
-    if (event.body) {
-      try { body = JSON.parse(event.body); } catch { body = {}; }
+    if (event.httpMethod === "GET") {
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify(latestSignal ? [latestSignal] : [])
+      };
     }
 
-    const data = { ...params, ...body };
+    const data = JSON.parse(event.body || "{}");
 
-    const signal = {
-      id: Date.now(),
+    latestSignal = {
+      id: Date.now().toString(),
       time: new Date().toISOString(),
-      action: String(data.action || data.signal || "TEST").toUpperCase(),
-      symbol: data.symbol || data.ticker || "UNKNOWN",
+      action: data.action || "BUY",
+      symbol: data.symbol || data.ticker || "XRPUSD",
       price: data.price || data.close || "",
-      sl: data.sl || "",
-      tp: data.tp || "",
+      sl: data.sl || "10",
+      tp: data.tp || "20",
       lot: data.lot || "0.01",
-      pattern: data.pattern || "TradingView Signal",
+      pattern: data.pattern || "TradingView",
       result: "OPEN",
-      profit: Number(data.profit || 0)
+      profit: 0
     };
-
-    signals.unshift(signal);
-    global.signals = signals;
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ success: true, signal })
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: true, signal: latestSignal })
     };
-  } catch (err) {
+  } catch (e) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, error: err.message })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: false, error: e.message })
     };
   }
 };
